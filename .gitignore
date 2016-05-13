@@ -22,3 +22,8 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+/todo.iml
+/.idea
+/todo.git
+/todo
