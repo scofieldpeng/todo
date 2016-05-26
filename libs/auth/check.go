@@ -1,0 +1,31 @@
+package auth
+
+import (
+	"github.com/labstack/echo"
+	"github.com/scofieldpeng/todo/libs/common"
+)
+
+// Check 用户api接口检查用户授权的middleware
+func Check(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		// 获取本次请求接口是否需要授权
+		if !ApiNeedAuth(ctx.Path(), RequestMethod(ctx.Request().Method())) {
+			return next(ctx)
+		}
+
+		// 需要授权,检查该用户是否成功登陆
+		cookie := GetTokenFromCookie(ctx)
+		if cookie == "" {
+			return common.BackUnAuthorized(ctx)
+		}
+
+		userid := GetUseridFromRedis(cookie)
+		if userid == 0 {
+			return common.BackUnAuthorized(ctx)
+		}
+
+		ctx.Set("userid", userid)
+		return next(ctx)
+
+	}
+}
