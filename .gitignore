@@ -23,6 +23,7 @@ _testmain.go
 *.test
 *.prof
 
+.Ds_Store
 /todo.iml
 /.idea
 /todo.git

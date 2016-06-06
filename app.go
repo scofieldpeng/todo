@@ -11,6 +11,9 @@ import (
 	_ "github.com/scofieldpeng/todo/routes"
 	"log"
 	"github.com/scofieldpeng/todo/libs/auth"
+	"github.com/scofieldpeng/template-go"
+	"path/filepath"
+	"os"
 )
 
 func init() {
@@ -40,8 +43,24 @@ func init() {
 	}
 	log.Println("初始化mysql完成")
 
+	// 初始化tpl
+	template.Tpl.SetTplSuffix(".html")
+	template.Tpl.SetDelimeter("[[","]]")
+	tplDir := filepath.Dir(os.Args[0]) + string(os.PathSeparator) + "tpls" + string(os.PathSeparator)
+	if err := template.Tpl.New(tplDir);err != nil {
+		log.Fatalln("初始化tpl失败!错误原因:",err.Error())
+	}
+	common.Echo.SetRenderer(template.Tpl)
 }
 
 func main() {
-	common.Echo.Run(standard.New(":8081"))
+	host,_ := config.Config("app").Get("app","host")
+	port,_ := config.Config("app").Get("app","port")
+	if host == "" {
+		host = "127.0.0.1"
+	}
+	if port == "" {
+		port = "8081"
+	}
+	common.Echo.Run(standard.New(host + ":" + port))
 }

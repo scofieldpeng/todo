@@ -7,5 +7,7 @@ import (
 
 // Index index页面
 func Index(ctx echo.Context) error {
-    return ctx.String(http.StatusOK,"hello world")
+    return ctx.Render(http.StatusOK,"index/index",map[string]string{
+        "Title":"TODO",
+    })
 }

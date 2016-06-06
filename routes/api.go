@@ -15,6 +15,7 @@ func init() {
     apiV1.GET(`/todo/:userid`, todo.List)
     // 插入TODO
     apiV1.POST(`/todo/:userid`,todo.Insert)
+    apiV1.GET(`/todo/:userid/:todoid`,todo.Detail)
     // TODO更新
     apiV1.PUT(`/todo/:userid/:todoid`, todo.Update)
     // TODO删除

@@ -8,7 +8,7 @@ import (
 // TODO模型
 type Todo struct {
 	ID         int    `json:"id"          xorm:"not null INT(11) pk autoincr 'id'"`              // 主键id
-	TodoName   string `json:"name"        xorm:"not null VARCHAR(50)"`                           // 标题
+	TodoName   string `json:"todo_name"   xorm:"not null VARCHAR(50)"`                           // 标题
 	UserID     int    `json:"userid"      xorm:"not null INT(10) index(user_todo) 'userid'"`     // 用户id
 	CategoryID int    `json:"category_id" xorm:"not null INT(10) index(user_todo) 'categoryid'"` // 分类id
 	CreateTime int    `json:"create_time" xorm:"not null INT(10)"`                               // 创建时间
