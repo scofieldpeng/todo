@@ -46,8 +46,8 @@ func init() {
 	// 初始化tpl
 	template.Tpl.SetTplSuffix(".html")
 	template.Tpl.SetDelimeter("[[","]]")
-	tplDir := filepath.Dir(os.Args[0]) + string(os.PathSeparator) + "tpls" + string(os.PathSeparator)
-	if err := template.Tpl.New(tplDir);err != nil {
+	currentPath,_ := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err := template.Tpl.New(currentPath + string(os.PathSeparator) + "tpls" + string(os.PathSeparator));err != nil {
 		log.Fatalln("初始化tpl失败!错误原因:",err.Error())
 	}
 	common.Echo.SetRenderer(template.Tpl)
