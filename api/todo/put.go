@@ -31,6 +31,12 @@ func Update(ctx echo.Context) error {
     if err := common.GetBodyStruct(ctx,&updateTODO);err != nil {
         return common.BackError(ctx,http.StatusBadRequest,204,"请上传正确的数据")
     }
+    if updateTODO.Star < 1 {
+        updateTODO.Star = 1
+    }
+    if updateTODO.Star > 4 {
+        updateTODO.Star = 4
+    }
 
     // 检查原有数据是否存在
     todoModel := todo.New()

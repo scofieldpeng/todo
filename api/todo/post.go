@@ -38,6 +38,13 @@ func Insert(ctx echo.Context) error {
         }
         return common.BackError(ctx,http.StatusBadRequest,204,"您没有权限新建,可能需要登录")
     }
+    if todoData.Star < 1 {
+        todoData.Star = 1
+    }
+    if todoData.Star > 4 {
+        todoData.Star = 4
+    }
+
     todoData.ID = 0
     todoData.UserID = userid
     if len(todoData.TodoName) < 1 || len(todoData.TodoName) > 300 {
