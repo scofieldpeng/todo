@@ -21,9 +21,7 @@ type Todo struct {
 
 // New 新建一个todo结构体对象
 func New() Todo {
-	return Todo{
-		Star:1,
-	}
+	return Todo{}
 }
 
 // Insert 插入数据
