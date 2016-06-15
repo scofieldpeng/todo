@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"fmt"
 	"github.com/scofieldpeng/mysql-go"
 )
 
@@ -51,4 +52,14 @@ func (u *User) Update(cols ...string) (int64, error) {
 	}
 
 	return engine.Update(u)
+}
+
+// IncrScore 增加某用户某条目的数量,传入要递增的积分值和该条目在数据库的字段名
+func (u *User) Incr(incrNum int, incrFieldName string) (int64, error) {
+	return mysql.Select().XormEngine().Id(u.UserID).Incr(incrFieldName, incrNum).Update(u)
+}
+
+// DecrScore 减少某用户某条目的数量,传入要减去的积分值和该条目在数据库的字段名
+func (u *User) Decr(decrNum int, decrFieldName string) (int64, error) {
+	return mysql.Select().XormEngine().Id(u.UserID).Decr(decrFieldName, decrNum).Where(fmt.Sprintf("%s>?", decrFieldName), decrNum).Update(u)
 }

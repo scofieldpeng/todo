@@ -7,6 +7,7 @@ import (
     "strconv"
     "github.com/scofieldpeng/todo/models/todo"
     "log"
+    "github.com/scofieldpeng/todo/models/user"
 )
 
 // Delete 删除数据
@@ -44,6 +45,15 @@ func Delete(ctx echo.Context) error {
     if _,err := todoModel.Delete();err != nil {
         log.Println("删除todo数据时失败,失败原因:",err.Error())
         return common.BackServerError(ctx,207)
+    }
+
+    // 如果用户当前todo未完成,删除后要减去该用户的已完成数量,单位1
+    if todoModel.Status != StatusFinish {
+        userModel := user.New()
+        userModel.UserID = userid
+        if _,err := userModel.Decr(1,"unfinish_num");err != nil {
+            log.Printf("减少用户的未完成数量失败,用户id:%d,错误原因:%#v\n",todoModel.UserID,err.Error())
+        }
     }
 
     return ctx.JSON(http.StatusOK,map[string]bool{

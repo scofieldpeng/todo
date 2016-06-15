@@ -38,7 +38,7 @@ func init() {
 	log.Println("初始化redis完成")
 
 	// 初始化myql
-	if err := mysql.Init(config.Config("mysql")); err != nil {
+	if err := mysql.Init(config.Config("mysql"),common.Debug); err != nil {
 		log.Fatalln("初始化mysql失败,错误原因:", err)
 	}
 	log.Println("初始化mysql完成")

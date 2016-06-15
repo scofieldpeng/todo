@@ -15,8 +15,9 @@ type Todo struct {
 	StartTime  int    `json:"start_time"  xorm:"not null INT(10)"`                               // 开始时间
 	EndTime    int    `json:"end_time"    xorm:"not null INT(10)"`                               // 结束时间
 	Status     int    `json:"status"      xorm:"not null TINYINT(1) default 0 index(user_todo)"` // 状态,0待做,1再做,2完成,3放弃
-	Star       int    `json:"star"        json:"not null TINYTIN(1) default 1"` // todo的重要程度,1为一般,2重要,3紧急,4重要且紧急
-	Remark     string `json:"remark"        xorm:"not null TEXT"`                                // 备注
+	Star       int    `json:"star"        xorm:"not null TINYTIN(1) default 1"`                  // todo的重要程度,1为一般,2重要,3紧急,4重要且紧急
+	Score      int    `json:"score"       xorm:"not null INT(10) default 0"`                     // 该todo的积分,用户设置,默认为0
+	Remark     string `json:"remark"      xorm:"not null TEXT"`                                  // 备注
 }
 
 // New 新建一个todo结构体对象

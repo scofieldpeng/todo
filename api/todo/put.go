@@ -7,6 +7,7 @@ import (
     "net/http"
     "github.com/scofieldpeng/todo/models/todo"
     "log"
+    "github.com/scofieldpeng/todo/models/user"
 )
 
 // Update 更新一条数据
@@ -37,6 +38,9 @@ func Update(ctx echo.Context) error {
     if updateTODO.Star > 4 {
         updateTODO.Star = 4
     }
+    if updateTODO.Score < 1 {
+        updateTODO.Score = 1
+    }
 
     // 检查原有数据是否存在
     todoModel := todo.New()
@@ -56,6 +60,29 @@ func Update(ctx echo.Context) error {
     if _,err := updateTODO.UpdateByID();err != nil {
         log.Printf("更新todo数据时出现错误,要更新的数据:%#v,错误原因:%s\n",updateTODO,err)
         return common.BackServerError(ctx,208)
+    }
+
+    // 如果将状态更新为已完成,将用户的总积分增加,未完成数量减1
+    // 如果将状态由完成更新为在做,将用户总积分减少,未完成数量加1
+    if updateTODO.Status == StatusFinish && todoModel.Status != StatusFinish{
+        userModel := user.New()
+        userModel.UserID = userid
+        if _,err := userModel.Incr(todoModel.Score,"score");err != nil {
+            log.Printf("更新用户的积分值失败,用户id:%d,要递增的数量:%d,错误原因:%#v\n",todoModel.UserID,todoModel.Score,err.Error())
+        }
+        if _,err := userModel.Decr(1,"unfinish_num");err != nil {
+            log.Printf("减少用户的未完成数量失败,用户id:%d,错误原因:%#v\n",todoModel.UserID,err.Error())
+        }
+    }
+    if todoModel.Status == StatusFinish && updateTODO.Status != StatusFinish {
+        userModel := user.New()
+        userModel.UserID = userid
+        if _,err := userModel.Decr(todoModel.Score,"score");err != nil {
+            log.Printf("更新用户的积分值失败,用户id:%d,错误原因:%#v\n",todoModel.UserID,err.Error())
+        }
+        if _,err := userModel.Incr(1,"unfinish_num");err != nil {
+            log.Printf("增加用户的积分值失败,用户id:%d,错误原因:%#v\n",todoModel.UserID,err.Error())
+        }
     }
 
     return ctx.JSON(http.StatusOK,updateTODO)
