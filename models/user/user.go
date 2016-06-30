@@ -30,7 +30,7 @@ func (u *User) Insert() (int64, error) {
 
 // Get 获取用户名
 func (u *User) Get() (bool, error) {
-	if u.UserID == 0 && u.UserName == "" {
+	if u.UserID == 0 && u.UserName == "" && u.Email == ""{
 		return false, errors.New("获取用户信息必须指定用户id或者用户名")
 	}
 	return mysql.Select().XormEngine().Get(u)
