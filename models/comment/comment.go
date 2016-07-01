@@ -1,6 +1,8 @@
 package comment
 
-import "github.com/scofieldpeng/mysql-go"
+import (
+    "github.com/scofieldpeng/mysql-go"
+)
 
 // Comment comment结构体对象
 type Comment struct {
@@ -37,7 +39,17 @@ func (c *Comment) Get() (bool,error) {
     return mysql.Select().XormEngine().Get(c)
 }
 
+// List 获取列表数据,第一个参数返回相关的列表数据,如果查询失败,第二个参数为空
+func (c *Comment) List() ([]Comment,error) {
+    var list []Comment
+    if err := mysql.Select().XormEngine().Find(&list,c);err != nil {
+        return []Comment{},err
+    }
+
+    return list,nil
+}
+
 // Delete 删除数据
-func (c *Comment) Delete() (bool,error) {
+func (c *Comment) Delete() (int64,error) {
     return mysql.Select().XormEngine().Delete(c)
 }
