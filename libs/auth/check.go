@@ -16,11 +16,13 @@ func Check(next echo.HandlerFunc) echo.HandlerFunc {
 		// 需要授权,检查该用户是否成功登陆
 		cookie := GetTokenFromCookie(ctx)
 		if cookie == "" {
+			//fmt.Println("need auth,but not found cookie")
 			return common.BackUnAuthorized(ctx)
 		}
 
 		userid := GetUseridFromRedis(cookie)
 		if userid == 0 {
+			//fmt.Println("need auth,but the cookie value is 0")
 			return common.BackUnAuthorized(ctx)
 		}
 

@@ -8,7 +8,7 @@ import (
 type Comment struct {
 	CommentID       int    `json:"commentid"        xorm:"not null INT(11) pk autoincr 'commentid'"`        // 评论id
 	TodoID          int    `json:"todoid"           xorm:"not null INT(11) index default '0' 'todoid'"`     // todoid
-	UserID          int    `json:"userid"           xorm:"not null INT(11) default '0' 'userid"`            // userid
+	UserID          int    `json:"userid"           xorm:"not null INT(11) default '0' 'userid'"`            // userid
 	ParentCommentID int    `json:"parent_commentid" xorm:"not null INT(11) default '0' 'parent_commentid'"` // 父级评论列表
 	Time            int    `json:"time"             xorm:"not null INT(11) default '0'"`                    // 评论时间
 	Content         string `json:"content"          xorm:"not null TEXT"`                                   // 评论内容
