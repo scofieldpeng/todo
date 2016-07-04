@@ -26,7 +26,7 @@ func Post(ctx echo.Context) error {
     useridInterface := ctx.Get("userid")
     userid,ok := useridInterface.(int)
     if !ok {
-        return common.BackServerError(ctx,203)
+        return common.BackError(ctx,http.StatusBadRequest,203,"没有权限")
     }
 
     // 检查tooid信息是否合法

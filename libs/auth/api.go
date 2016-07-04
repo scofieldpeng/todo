@@ -101,16 +101,19 @@ func Init() error {
 func ApiNeedAuth(path string, method RequestMethod) bool {
 	version := getVersion(path)
 	if version == "" {
-		return false
+		return true
 	}
-	if pathInfo, ok := apiPathList[version]; !ok {
-		return false
+	if pathInfos, ok := apiPathList[version]; !ok {
+		//fmt.Println("没找到version")
+		return true
 	} else {
-		if pathInfo, ok := pathInfo[path]; !ok {
-			return false
+		if pathInfo, ok := pathInfos[path]; !ok {
+			//fmt.Println("没找到path:",path)
+			return true
 		} else {
 			if methodInfo, ok := pathInfo.ApiMethod[method]; !ok {
-				return false
+				//fmt.Println("没找到path对应的method,path:",path,",method:",method)
+				return true
 			} else {
 				return methodInfo.Auth
 			}
