@@ -5,6 +5,7 @@ import (
 	"github.com/scofieldpeng/todo/api/user"
 	"github.com/scofieldpeng/todo/libs/auth"
 	"github.com/scofieldpeng/todo/libs/common"
+	"github.com/scofieldpeng/todo/api/comment"
 )
 
 func init() {
@@ -23,8 +24,9 @@ func init() {
 	apiV1.DELETE(`/todo/:userid/:todoid`, todo.Delete)
 
 	// TODO 评论
-	apiV1.Get(`/todo/:todoid/comments`,todo.Comments) // todo评论列表
-	
+	apiV1.Get(`/todo/:todoid/comments`,comment.List) // todo评论列表
+	apiV1.Get(`/todo/:todoid/comments`,comment.Post) // todo添加
+
 
 	apiV1.POST(`/login`, user.Login)       // 登录用户
 	apiV1.POST(`/register`, user.Register) // 注册用户
