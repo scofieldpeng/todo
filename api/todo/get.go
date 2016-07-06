@@ -35,7 +35,7 @@ func List(ctx echo.Context) error {
 	})
 }
 
-// TODO RegularList 获取定期todo列表
+// RegularList 获取定期todo列表
 func RegularList(ctx echo.Context) error {
 	useridInterface := ctx.Get("userid")
 	userid,ok := useridInterface.(int)
@@ -130,7 +130,34 @@ func Detail(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, todoModel)
 }
 
-// TODO RegularDetail 获取定期todo详情
+// RegularDetail 获取定期todo详情
 func RegularDetail(ctx echo.Context) error {
-	return nil
+	useridInterface := ctx.Get("userid")
+	userid,ok := useridInterface.(int)
+	if !ok {
+		return common.BackServerError(ctx,201)
+	}
+	inputUserid,err := strconv.Atoi(ctx.Param("userid"))
+	if err != nil || inputUserid < 1 {
+		return common.BackError(ctx,http.StatusBadRequest,202,"请输入正确的用户名")
+	}
+	if userid != inputUserid {
+		return common.BackError(ctx,http.StatusBadRequest,203,"授权不通过")
+	}
+
+	todoid,err := strconv.Atoi(ctx.Param("todoid"))
+	if err != nil || todoid < 1 {
+		return common.BackError(ctx,http.StatusBadRequest,204,"todoid不正确")
+	}
+
+	regularTodoModel := regulartodo.New()
+	regularTodoModel.RegularTodoID = todoid
+	if exsit,err := regularTodoModel.Get();err != nil {
+		log.Println("获取regular_todo详情失败,regular_todoid:",todoid,",错误原因:",err.Error())
+		return common.BackServerError(ctx,205)
+	} else if !exsit {
+		return common.BackError(ctx,http.StatusBadRequest,205,"该todo不存在")
+	}
+
+	return ctx.JSON(http.StatusOK,regularTodoModel)
 }
