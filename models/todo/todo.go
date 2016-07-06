@@ -7,17 +7,19 @@ import (
 
 // TODO模型
 type Todo struct {
-	ID         int    `json:"id"          xorm:"not null INT(11) pk autoincr 'id'"`              // 主键id
-	TodoName   string `json:"todo_name"   xorm:"not null VARCHAR(50)"`                           // 标题
-	UserID     int    `json:"userid"      xorm:"not null INT(10) index(user_todo) 'userid'"`     // 用户id
-	CategoryID int    `json:"category_id" xorm:"not null INT(10) index(user_todo) 'categoryid'"` // 分类id
-	CreateTime int    `json:"create_time" xorm:"not null INT(10)"`                               // 创建时间
-	StartTime  int    `json:"start_time"  xorm:"not null INT(10)"`                               // 开始时间
-	EndTime    int    `json:"end_time"    xorm:"not null INT(10)"`                               // 结束时间
-	Status     int    `json:"status"      xorm:"not null TINYINT(1) default 0 index(user_todo)"` // 状态,0待做,1再做,2完成,3放弃
-	Star       int    `json:"star"        xorm:"not null TINYTIN(1) default 1"`                  // todo的重要程度,1为一般,2重要,3紧急,4重要且紧急
-	Score      int    `json:"score"       xorm:"not null INT(10) default 0"`                     // 该todo的积分,用户设置,默认为0
-	Remark     string `json:"remark"      xorm:"not null TEXT"`                                  // 备注
+	ID            int    `json:"id"             xorm:"not null INT(11) pk autoincr 'id'"`                   // 主键id
+	TodoName      string `json:"todo_name"      xorm:"not null VARCHAR(50)"`                                // 标题
+	Type          int    `json:"type"           xorm:"not null TINYINT(1)"`                                 // TODO类型,0为单次,1为每日,2为每周,3为每月
+	RegularTodoID int    `json:"regular_todoid" xorm:"not null INT(11) index 'regular_todoid' default '0'"` // 定期任务todoid
+	UserID        int    `json:"userid"         xorm:"not null INT(10) index(user_todo) 'userid'"`          // 用户id
+	CategoryID    int    `json:"category_id"    xorm:"not null INT(10) index(user_todo) 'categoryid'"`      // 分类id
+	CreateTime    int    `json:"create_time"    xorm:"not null INT(10)"`                                    // 创建时间
+	StartTime     int    `json:"start_time"     xorm:"not null INT(10)"`                                    // 开始时间
+	EndTime       int    `json:"end_time"       xorm:"not null INT(10)"`                                    // 结束时间
+	Status        int    `json:"status"         xorm:"not null TINYINT(1) default '0' index(user_todo)"`    // 状态,0待做,1再做,2完成,3放弃
+	Star          int    `json:"star"           xorm:"not null TINYTIN(1) default '1'"`                     // todo的重要程度,1为一般,2重要,3紧急,4重要且紧急
+	Score         int    `json:"score"          xorm:"not null INT(10) default 0"`                          // 该todo的积分,用户设置,默认为0
+	Remark        string `json:"remark"         xorm:"not null TEXT"`                                       // 备注
 }
 
 // New 新建一个todo结构体对象

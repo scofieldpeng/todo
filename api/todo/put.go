@@ -87,3 +87,8 @@ func Update(ctx echo.Context) error {
 
     return ctx.JSON(http.StatusOK,updateTODO)
 }
+
+// TODO RegularUpdate 更新定期TODO
+func RegularUpdate(ctx echo.Context) error {
+    return nil
+}

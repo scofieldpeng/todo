@@ -60,3 +60,8 @@ func Delete(ctx echo.Context) error {
         "status":true,
     })
 }
+
+// TODO DeleteRegular 删除定期todo
+func RegularDelete(ctx echo.Context) error {
+    return nil
+}

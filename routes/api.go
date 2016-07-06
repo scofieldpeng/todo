@@ -16,14 +16,24 @@ func init() {
 	apiV1.GET(`/todo/:userid`, todo.List)
 	// 插入TODO
 	apiV1.POST(`/todo/:userid`, todo.Insert)
-    // TODO详情
+	// TODO详情
 	apiV1.GET(`/todo/:userid/:todoid`, todo.Detail)
 	// TODO更新
 	apiV1.PUT(`/todo/:userid/:todoid`, todo.Update)
 	// TODO删除
 	apiV1.DELETE(`/todo/:userid/:todoid`, todo.Delete)
 
-	// TODO 评论
+	// 定期TODO
+	// 定期TODO列表
+	apiV1.Get(`/todo/regular/:userid`,todo.RegularList)
+	// 定期TODO详情
+	apiV1.Get(`/todo/regular/:userid/:todoid`,todo.RegularDetail)
+	// 定期TODO更新
+	apiV1.PUT(`/todo/regular/:userid/:todoid`,todo.RegularUpdate)
+	// 删除定期TODO
+	apiV1.DELETE(`/todo/regular/:userid/:todoid`,todo.RegularDelete)
+
+	// TODO评论
 	apiV1.GET(`/todo/:todoid/comments`,comment.List) // todo评论列表
 	apiV1.POST(`/todo/:todoid/comments`,comment.Post) // todo添加
 	apiV1.PUT(`/todo/:todoid/comments/:commentid`,comment.Put) // todo更新

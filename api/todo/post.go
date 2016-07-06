@@ -12,6 +12,7 @@ import (
 )
 
 // Insert 插入一条数据
+// TODO 插入一条定期todo
 func Insert(ctx echo.Context) error {
     userid,ok := ctx.Get("userid").(int)
     if !ok {
