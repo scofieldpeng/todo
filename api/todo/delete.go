@@ -8,6 +8,7 @@ import (
     "github.com/scofieldpeng/todo/models/todo"
     "log"
     "github.com/scofieldpeng/todo/models/user"
+    "github.com/scofieldpeng/todo/models/regulartodo"
 )
 
 // Delete 删除数据
@@ -61,7 +62,65 @@ func Delete(ctx echo.Context) error {
     })
 }
 
-// TODO DeleteRegular 删除定期todo
+// deleteRegular 删除定期todo
 func RegularDelete(ctx echo.Context) error {
-    return nil
+    useridInterface := ctx.Get("userid")
+    userid,ok := useridInterface.(int)
+    if !ok {
+        return common.BackServerError(ctx,201)
+    }
+    inputUserid,err := strconv.Atoi(ctx.Param("userid"))
+    if err != nil || inputUserid < 1 {
+        return common.BackError(ctx,http.StatusBadRequest,202,"请输入正确的用户名")
+    }
+    if userid != inputUserid {
+        return common.BackError(ctx,http.StatusBadRequest,203,"授权不通过")
+    }
+
+    todoid,err := strconv.Atoi(ctx.Param("todoid"))
+    if err != nil || todoid < 1 {
+        return common.BackError(ctx,http.StatusBadRequest,204,"todoid不正确")
+    }
+
+    regularTodoModel := regulartodo.New()
+    regularTodoModel.RegularTodoID = todoid
+    if exsit,err := regularTodoModel.Get();err != nil {
+        log.Println("获取regular_todo详情失败,regular_todoid:",todoid,",错误原因:",err.Error())
+        return common.BackServerError(ctx,205)
+    } else if !exsit {
+        return common.BackError(ctx,http.StatusBadRequest,205,"该todo不存在")
+    }
+    if regularTodoModel.Userid != userid {
+        return common.BackError(ctx,http.StatusBadRequest,206,"没有权限删除该todo")
+    }
+
+    deleteTodoModel := regularTodoModel
+    deleteTodoModel.RegularTodoID = todoid
+    if _,err := deleteTodoModel.Delete();err != nil {
+        log.Println("删除regular_todo失败,要删除的reguarl_todoid:",todoid,",错误原因:",err.Error())
+        return common.BackServerError(ctx,207)
+    }
+
+    // 将所属于该regulartodo的todo(未完成)一并删除
+    todoModel := todo.New()
+    todoModel.RegularTodoID = todoid
+    todoModel.Status = StatusDefault
+    deleteNum,err := todoModel.Delete()
+    if err != nil {
+        log.Printf("删除regular_todo生成的待做todo列表数据失败,要删除的todoid:%d,错误原因:%s\n",todoid,err.Error())
+        if _,err := regularTodoModel.Insert();err != nil {
+            log.Printf("删除regular_todo生成的待做todo列表数据失败,回滚regulartodo失败,回滚regular_todo数据:%#v,错误原因:%s\n",regularTodoModel,err.Error())
+            return common.BackServerError(ctx,208)
+        }
+        return common.BackServerError(ctx,209)
+    }
+    // 将用户未完成数量减少
+    userModel := user.New()
+    userModel.UserID = userid
+    if _,err := userModel.Decr(int(deleteNum),"unfinish_num");err != nil {
+        log.Println("减小用户未完成数量失败,用户id:",userid,",错误原因:",err.Error())
+        return common.BackServerError(ctx,210)
+    }
+
+    return common.BackOk(ctx)
 }

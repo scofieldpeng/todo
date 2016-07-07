@@ -44,6 +44,18 @@ func (t *Todo) UpdateByID(cols ...string) (int64, error) {
 	return engine.Id(t.ID).Update(t)
 }
 
+// UpdateByRegularID 更新regularID更新
+func (t *Todo) UpdateByRegularID(cols ...string)(int64,error) {
+	engine := mysql.Select().XormEngine().NewSession()
+	if len(cols) == 0 {
+		engine.AllCols()
+	} else {
+		engine.Cols(cols...)
+	}
+
+	return engine.Where("regular_todoid=? AND status=?",t.RegularTodoID,t.Status).Update(t)
+}
+
 // Get 获取一条数据
 func (t *Todo) Get() (bool, error) {
 	return mysql.Select().XormEngine().Get(t)

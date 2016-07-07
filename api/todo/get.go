@@ -158,6 +158,9 @@ func RegularDetail(ctx echo.Context) error {
 	} else if !exsit {
 		return common.BackError(ctx,http.StatusBadRequest,205,"该todo不存在")
 	}
+	if regularTodoModel.Userid != userid {
+		return common.BackError(ctx,http.StatusBadRequest,206,"没有权限访问该todo")
+	}
 
 	return ctx.JSON(http.StatusOK,regularTodoModel)
 }
