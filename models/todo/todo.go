@@ -69,6 +69,14 @@ func (t *Todo) Delete() (int64, error) {
 	return mysql.Select().XormEngine().Delete(t)
 }
 
+// DeleteByIDs 删除一定id区间内的todo数据
+func (t *Todo) DeleteByIDs(ids []int)(int64,error) {
+	if len(ids) == 0 {
+		return 0,nil
+	}
+	return mysql.Select().XormEngine().In("id",ids).Delete(t)
+}
+
 // List 获取列表数据
 func (t *Todo) List() ([]Todo, error) {
 	var list []Todo
