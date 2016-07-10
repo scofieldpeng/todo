@@ -22,6 +22,16 @@ type Todo struct {
 	Remark        string `json:"remark"         xorm:"not null TEXT"`                                       // 备注
 }
 
+// listCondition 列表查询条件
+// 选择放在这里而不是api那里是因为会引起引用循坏,在没有想到更合理的办法之前先放在这里吧
+type ListCondtion struct {
+	StartTime       int // 开始时间
+	EndTime         int // 结束时间
+	StartCreateTime int // 创建时间(起)
+	EndCreateTime   int // 创建时间(止)
+	Star int // 重要程度
+}
+
 // New 新建一个todo结构体对象
 func New() Todo {
 	return Todo{}
@@ -78,11 +88,68 @@ func (t *Todo) DeleteByIDs(ids []int)(int64,error) {
 }
 
 // List 获取列表数据
-func (t *Todo) List() ([]Todo, error) {
+func (t *Todo) List(order ...string) ([]Todo, error) {
 	var list []Todo
-	if err := mysql.Select().XormEngine().Find(&list, t); err != nil {
+	engine := mysql.Select().XormEngine().NewSession()
+	if len(order) > 0 {
+		engine.OrderBy(order[0])
+	}
+	if err := engine.Find(&list, t); err != nil {
 		return []Todo{}, err
 	}
 
 	return list, nil
+}
+
+// Page 获取分页列表数据
+func (t *Todo) Page(page,pageSize int,whereCond ListCondtion,order ...string) (int64,[]Todo,error) {
+	t1 := *t
+	var list []Todo
+	totalEngine := mysql.Select().XormEngine().NewSession()
+	listEngine := mysql.Select().XormEngine()
+
+	if whereCond.StartTime !=0 {
+		totalEngine.Where("start_time>=?",whereCond.StartTime)
+		listEngine.Where("start_time>=?",whereCond.StartTime)
+		t1.StartTime = 0
+	}
+	if whereCond.EndTime != 0 {
+		totalEngine.Where("end_time<=?",whereCond.EndTime)
+		listEngine.Where("end_time<=?",whereCond.EndTime)
+		t1.EndTime = 0
+	}
+
+	if whereCond.StartCreateTime != 0 {
+		totalEngine.Where("create_time<=?",whereCond.StartCreateTime)
+		listEngine.Where("create_time<=?",whereCond.EndCreateTime)
+		t1.CreateTime = 0
+	}
+	if whereCond.Star != 0 {
+		totalEngine.Where("star=?",t1.Star)
+		listEngine.Where("star=?",t1.Star)
+	}
+
+	total,err := totalEngine.Count(t1)
+	if err != nil {
+		return 0,[]Todo{},err
+	}
+	if total < 1 {
+		return 0,[]Todo{},nil
+	}
+	if len(order) > 0 {
+		listEngine.OrderBy(order[0])
+	}
+
+	if pageSize < 20 {
+		pageSize = 20
+	}
+	if page < 1 {
+		page = 1
+	}
+
+	if err := listEngine.Limit(pageSize,(page-1)*pageSize).Find(&list,t1);err != nil {
+		return 0,[]Todo{},err
+	}
+
+	return total,list,nil
 }

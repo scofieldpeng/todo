@@ -20,3 +20,10 @@ const (
 	EmergencyTodo                     // 紧急todo
 	EmergencyImportantTodo            // 紧急且重要todo
 )
+
+const (
+	DefaultOrder   = "create_time DESC" // 默认排序
+	StarOrder      = "star DESC"        // 星级排序
+	StartTimeOrder = "start_time DESC"  // 创建时间排序
+	EndTimeOrder   = "end_time DESC"    // 结束时间排序
+)

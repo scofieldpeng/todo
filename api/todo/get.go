@@ -3,30 +3,72 @@ package todo
 import (
 	"github.com/labstack/echo"
 	"github.com/scofieldpeng/todo/libs/common"
+	"github.com/scofieldpeng/todo/models/regulartodo"
 	"github.com/scofieldpeng/todo/models/todo"
 	"log"
 	"net/http"
 	"strconv"
-	"github.com/scofieldpeng/todo/models/regulartodo"
 )
 
-// List 获取列表数据
+// List 获取分页列表数据
 func List(ctx echo.Context) error {
 	userid, err := strconv.Atoi(ctx.Param("userid"))
 	if err != nil || userid < 1 {
 		return common.BackError(ctx, http.StatusBadRequest, 201, "用户id不正确")
 	}
+	page, err := strconv.Atoi(ctx.QueryParam("page"))
+	if err != nil || page < 1 {
+		page = 1
+	}
+	pageSize, err := strconv.Atoi(ctx.QueryParam("page_size"))
+	if err != nil || pageSize < 1 {
+		pageSize = 20
+	}
+	categoryid,err := strconv.Atoi(ctx.QueryParam("categoryid"))
+	if err != nil || categoryid < 1{
+		categoryid = 0
+	}
+	order := ctx.QueryParam("order")
+	if err != nil || (order != StarOrder && order != StartTimeOrder || order != EndTimeOrder) {
+		order = DefaultOrder
+	}
+
+	var lc todo.ListCondtion
+	startTime,err := strconv.Atoi(ctx.QueryParam("start_time"))
+	if err != nil || startTime < 0{
+		lc.StartTime = startTime
+	}
+	endTime,err := strconv.Atoi(ctx.QueryParam("end_time"))
+	if err != nil {
+		lc.EndTime = endTime
+	}
+	startCreateTime,err := strconv.Atoi(ctx.QueryParam("start_create_time"))
+	if err != nil || startCreateTime < 0 {
+		lc.StartCreateTime = 0
+	}
+	endCreateTime,err := strconv.Atoi(ctx.QueryParam("end_create_time"))
+	if err != nil || endCreateTime < 0 {
+		lc.EndCreateTime = 0
+	}
+	star,err := strconv.Atoi(ctx.QueryParam("star"))
+	if err != nil || star < NormalTodo || star > EmergencyImportantTodo && star != -1{
+		lc.Star = NormalTodo
+	}
+	status, err := strconv.Atoi(ctx.QueryParam("status"))
+	if err != nil || (status < StatusDefault || status > StatusPaused) && status != -1{
+		status = StatusDefault
+	}
 
 	todoModel := todo.New()
 	todoModel.UserID = userid
-	list, err := todoModel.List()
+	if status != -1 {
+		todoModel.Status = status
+	}
+	todoModel.CategoryID = categoryid
+	total, list, err := todoModel.Page(page, pageSize, lc,order)
 	if err != nil {
 		log.Println("获取todo列表数据失败,获取的userid为:", userid, ",错误原因:", err)
 		return common.BackServerError(ctx, 202)
-	}
-	total := len(list)
-	if total == 0 {
-		list = make([]todo.Todo, 0)
 	}
 
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
@@ -38,71 +80,66 @@ func List(ctx echo.Context) error {
 // RegularList 获取定期todo列表
 func RegularList(ctx echo.Context) error {
 	useridInterface := ctx.Get("userid")
-	userid,ok := useridInterface.(int)
+	userid, ok := useridInterface.(int)
 	if !ok {
-		return common.BackServerError(ctx,201)
+		return common.BackServerError(ctx, 201)
 	}
 
-	page,err := strconv.Atoi(ctx.QueryParam("page"))
+	page, err := strconv.Atoi(ctx.QueryParam("page"))
 	if err != nil || page < 1 {
 		page = 1
 	}
-	pageSize,err := strconv.Atoi(ctx.QueryParam("page_size"))
+	pageSize, err := strconv.Atoi(ctx.QueryParam("page_size"))
 	if err != nil || pageSize < 1 {
 		pageSize = 20
 	}
-	categoryid,err := strconv.Atoi(ctx.QueryParam("categoryid"))
+	categoryid, err := strconv.Atoi(ctx.QueryParam("categoryid"))
 	if err != nil || categoryid < 1 {
 		categoryid = 0
 	}
-	startTime,err := strconv.Atoi(ctx.QueryParam("start_time"))
-	if err != nil || startTime < 1 {
-		startTime = 0
-	}
-	endTime,err := strconv.Atoi(ctx.QueryParam("end_time"))
-	if err != nil || endTime < 1 {
-		endTime = 0
-	}
-	if endTime < startTime && (startTime != 0 && endTime != 0) {
-		return common.BackError(ctx,http.StatusBadRequest,202,"结束时间不能小于开始时间")
-	}
-	createTime,err := strconv.Atoi(ctx.QueryParam("create_time"))
-	if err != nil || createTime < 1{
-		createTime  = 0
-	}
-	status,err := strconv.Atoi(ctx.QueryParam("status"))
-	if err != nil || ( status < StatusDefault || status > StatusPaused ) {
+	status, err := strconv.Atoi(ctx.QueryParam("status"))
+	if err != nil || (status < StatusDefault || status > StatusPaused) {
 		status = StatusDefault
 	}
-	todoType,err := strconv.Atoi(ctx.QueryParam("type"))
+	todoType, err := strconv.Atoi(ctx.QueryParam("type"))
 	if err != nil || (todoType < OnceTodo || todoType > MonthlyTodo) {
 		todoType = OnceTodo
 	}
-	star,err := strconv.Atoi(ctx.QueryParam("star"))
-	if err != nil || (star < NormalTodo || star > EmergencyImportantTodo) {
-		star = NormalTodo
+	order := ctx.QueryParam("order")
+	if err != nil || (order != StarOrder && order != StartTimeOrder || order != EndTimeOrder) {
+		order = DefaultOrder
 	}
 
+	var lc todo.ListCondtion
+	startCreateTime,err := strconv.Atoi(ctx.QueryParam("start_create_time"))
+	if err != nil || startCreateTime < 0 {
+		lc.StartCreateTime = 0
+	}
+	endCreateTime,err := strconv.Atoi(ctx.QueryParam("end_create_time"))
+	if err != nil || endCreateTime < 0 {
+		lc.EndCreateTime = 0
+	}
+	star,err := strconv.Atoi(ctx.QueryParam("star"))
+	if err != nil || star < NormalTodo || star > EmergencyImportantTodo && star != -1{
+		lc.Star = 0
+	}
 
 	regularTodoModel := regulartodo.New()
 	regularTodoModel.CategoryID = categoryid
 	regularTodoModel.Userid = userid
-	regularTodoModel.StartTime = startTime
-	regularTodoModel.EndTime = endTime
-	regularTodoModel.CreateTime = createTime
 	regularTodoModel.Type = todoType
 	regularTodoModel.Star = star
 	regularTodoModel.Status = status
 
-	total,list,err := regularTodoModel.Page(page,pageSize)
+	total, list, err := regularTodoModel.Page(page, pageSize,lc,order)
 	if err != nil {
-		log.Printf("获取定期todo列表数据失败,regularTodo数据:%#v,错误原因:%s\n",regularTodoModel,err.Error())
-		return common.BackServerError(ctx,203)
+		log.Printf("获取定期todo列表数据失败,regularTodo数据:%#v,错误原因:%s\n", regularTodoModel, err.Error())
+		return common.BackServerError(ctx, 203)
 	}
 
-	return ctx.JSON(http.StatusOK,map[string]interface{}{
-		"total":total,
-		"list":list,
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"total": total,
+		"list":  list,
 	})
 }
 
@@ -133,34 +170,34 @@ func Detail(ctx echo.Context) error {
 // RegularDetail 获取定期todo详情
 func RegularDetail(ctx echo.Context) error {
 	useridInterface := ctx.Get("userid")
-	userid,ok := useridInterface.(int)
+	userid, ok := useridInterface.(int)
 	if !ok {
-		return common.BackServerError(ctx,201)
+		return common.BackServerError(ctx, 201)
 	}
-	inputUserid,err := strconv.Atoi(ctx.Param("userid"))
+	inputUserid, err := strconv.Atoi(ctx.Param("userid"))
 	if err != nil || inputUserid < 1 {
-		return common.BackError(ctx,http.StatusBadRequest,202,"请输入正确的用户名")
+		return common.BackError(ctx, http.StatusBadRequest, 202, "请输入正确的用户名")
 	}
 	if userid != inputUserid {
-		return common.BackError(ctx,http.StatusBadRequest,203,"授权不通过")
+		return common.BackError(ctx, http.StatusBadRequest, 203, "授权不通过")
 	}
 
-	todoid,err := strconv.Atoi(ctx.Param("todoid"))
-	if err != nil || todoid < 1 {
-		return common.BackError(ctx,http.StatusBadRequest,204,"todoid不正确")
+	regularTodoid, err := strconv.Atoi(ctx.Param("todoid"))
+	if err != nil || regularTodoid < 1 {
+		return common.BackError(ctx, http.StatusBadRequest, 204, "todoid不正确")
 	}
 
 	regularTodoModel := regulartodo.New()
-	regularTodoModel.RegularTodoID = todoid
-	if exsit,err := regularTodoModel.Get();err != nil {
-		log.Println("获取regular_todo详情失败,regular_todoid:",todoid,",错误原因:",err.Error())
-		return common.BackServerError(ctx,205)
+	regularTodoModel.RegularTodoID = regularTodoid
+	if exsit, err := regularTodoModel.Get(); err != nil {
+		log.Println("获取regular_todo详情失败,regular_todoid:", regularTodoid, ",错误原因:", err.Error())
+		return common.BackServerError(ctx, 205)
 	} else if !exsit {
-		return common.BackError(ctx,http.StatusBadRequest,205,"该todo不存在")
+		return common.BackError(ctx, http.StatusBadRequest, 205, "该todo不存在")
 	}
 	if regularTodoModel.Userid != userid {
-		return common.BackError(ctx,http.StatusBadRequest,206,"没有权限访问该todo")
+		return common.BackError(ctx, http.StatusBadRequest, 206, "没有权限访问该todo")
 	}
 
-	return ctx.JSON(http.StatusOK,regularTodoModel)
+	return ctx.JSON(http.StatusOK, regularTodoModel)
 }
