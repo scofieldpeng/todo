@@ -15,7 +15,6 @@ type User struct {
 	Salt        string `json:"-"            xorm:"not null VARCHAR(8)"`                   // SALT
 	CreateTime  int    `json:"create_time"  xorm:"not null INT(10)"`                      // 账号创建时间
 	LastLogin   int    `json:"last_login"   xorm:"not null INT(11)"`                      // 最近一次登录时间
-	UnfinishNum int    `json:"unfinish_num" xorm:"not null INT(11)"`                      // 未完成数量
 }
 
 // New 新建一个用户结构体对象

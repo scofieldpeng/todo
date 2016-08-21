@@ -187,10 +187,10 @@ func Find(ctx echo.Context) error {
 		return common.BackError(ctx, http.StatusBadRequest, 204, "请上传正确的数据")
 	}
 
-	if exsit, err := userModel.Get(); err != nil {
+	if exist, err := userModel.Get(); err != nil {
 		log.Printf("获取用户信息失败!要查找的用户信息:%v,错误原因:%s\n", userModel, err.Error())
 		return common.BackServerError(ctx, 205)
-	} else if !exsit {
+	} else if !exist {
 		return common.BackError(ctx, http.StatusBadRequest, 206, "该账号没有注册")
 	}
 

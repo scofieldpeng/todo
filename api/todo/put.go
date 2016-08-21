@@ -73,9 +73,6 @@ func Update(ctx echo.Context) error {
         if _,err := userModel.Incr(todoModel.Score,"score");err != nil {
             log.Printf("更新用户的积分值失败,用户id:%d,要递增的数量:%d,错误原因:%#v\n",todoModel.UserID,todoModel.Score,err.Error())
         }
-        if _,err := userModel.Decr(1,"unfinish_num");err != nil {
-            log.Printf("减少用户的未完成数量失败,用户id:%d,错误原因:%#v\n",todoModel.UserID,err.Error())
-        }
     }
     if todoModel.Status == StatusFinish && updateTodo.Status != StatusFinish {
         userModel := user.New()

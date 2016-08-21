@@ -14,6 +14,8 @@ import (
 	"github.com/scofieldpeng/template-go"
 	"path/filepath"
 	"os"
+	"github.com/tylerb/graceful"
+	"time"
 )
 
 func init() {
@@ -62,5 +64,8 @@ func main() {
 	if port == "" {
 		port = "8081"
 	}
-	common.Echo.Run(standard.New(host + ":" + port))
+
+	std := standard.New(host + ":" + port)
+	std.SetHandler(common.Echo)
+	graceful.ListenAndServe(std.Server,5*time.Second)
 }

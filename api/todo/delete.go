@@ -138,14 +138,6 @@ func RegularDelete(ctx echo.Context) error {
         }
     }
 
-    // 将用户未完成数量减少
-    userModel := user.New()
-    userModel.UserID = userid
-    if _,err := userModel.Decr(1,"unfinish_num");err != nil {
-        log.Println("减小用户未完成数量失败,用户id:",userid,",错误原因:",err.Error())
-        return common.BackServerError(ctx,212)
-    }
-
     // 删除该regular_todo的评论数据
     commentModel := comment.New()
     commentModel.Type = apiComment.Rugular_TODO

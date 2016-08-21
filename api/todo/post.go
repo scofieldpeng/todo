@@ -8,7 +8,6 @@ import (
     "time"
     "log"
     "strconv"
-    "github.com/scofieldpeng/todo/models/user"
 )
 
 // Insert 插入一条数据
@@ -62,13 +61,6 @@ func Insert(ctx echo.Context) error {
     if _,err := todoData.Insert();err != nil {
         log.Println("插入TODO数据失败,失败原因:",err)
         return common.BackServerError(ctx,206)
-    }
-
-    // 增加用户未完成数量
-    userModel := user.New()
-    userModel.UserID = userid
-    if _,err := userModel.Incr(1,"unfinish_num");err != nil {
-        log.Printf("增加用户的积分值失败,用户id:%d,错误原因:%#v\n",userid,err.Error())
     }
 
     return ctx.JSON(http.StatusOK,todoData)
