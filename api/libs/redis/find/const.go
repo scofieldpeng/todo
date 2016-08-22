@@ -13,5 +13,5 @@ const (
 
 // generateRedisToken 生成redistoken值
 func generateRedisToken(token string) string {
-	return fmt.Sprintf(RedisToken,token)
+	return fmt.Sprintf(RedisToken, token)
 }

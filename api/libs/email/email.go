@@ -26,14 +26,14 @@ func (e *Email) SetTpl(tpl string) *Email {
 }
 
 // SetTplVal 设置模板变量
-func (e *Email) SetTplVal(tpl,val string) *Email {
+func (e *Email) SetTplVal(tpl, val string) *Email {
 	e.tplVals[tpl] = val
 	return e
 }
 
 // SetTplVals 设置多个模板的变量
 func (e *Email) SetTplVals(tpls map[string]string) *Email {
-	for key,val := range tpls {
+	for key, val := range tpls {
 		e.tplVals[key] = val
 	}
 	return e
@@ -43,7 +43,6 @@ func (e *Email) SetTplVals(tpls map[string]string) *Email {
 func (e *Email) Send() error {
 	return nil
 }
-
 
 func New() Email {
 	return Email{

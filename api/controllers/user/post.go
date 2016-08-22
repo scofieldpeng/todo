@@ -230,34 +230,34 @@ func Find(ctx echo.Context) error {
 // 通过判断是否存在重置token,然后根据token进行重置密码操作
 func ResetPwd(ctx echo.Context) error {
 	var data resetData
-	if err := common.GetBodyStruct(ctx,&data);err != nil {
-		return common.BackError(ctx,http.StatusBadRequest,201,"服务器内部错误")
+	if err := common.GetBodyStruct(ctx, &data); err != nil {
+		return common.BackError(ctx, http.StatusBadRequest, 201, "服务器内部错误")
 	}
 	if data.Token == "" {
-		return common.BackError(ctx,http.StatusBadRequest,202,"请传入token值")
+		return common.BackError(ctx, http.StatusBadRequest, 202, "请传入token值")
 	}
-	if err := validPassword(data.Password);err != nil {
-		return common.BackError(ctx,http.StatusBadRequest,203,"请传入密码")
+	if err := validPassword(data.Password); err != nil {
+		return common.BackError(ctx, http.StatusBadRequest, 203, "请传入密码")
 	}
 
 	// 检查token是否有效
-	userid,err := find.GetUserIDFromToken(data.Token)
+	userid, err := find.GetUserIDFromToken(data.Token)
 	if err != nil {
-		log.Println("获取redis值中的token失败,token:",data.Token,",失败原因:",err.Error())
-		return common.BackServerError(ctx,204)
+		log.Println("获取redis值中的token失败,token:", data.Token, ",失败原因:", err.Error())
+		return common.BackServerError(ctx, 204)
 	}
 	if userid < 1 {
-		return common.BackError(ctx,http.StatusBadRequest,205,"没有找到该用户")
+		return common.BackError(ctx, http.StatusBadRequest, 205, "没有找到该用户")
 	}
 
 	// 查询该用户是否存在
 	userModel := user.New()
 	userModel.UserID = userid
-	if exsit,err := userModel.Get();err != nil {
-		log.Println("获取用户信息失败,用户id:",userid,",失败原因:",err.Error())
-		return common.BackServerError(ctx,206)
+	if exsit, err := userModel.Get(); err != nil {
+		log.Println("获取用户信息失败,用户id:", userid, ",失败原因:", err.Error())
+		return common.BackServerError(ctx, 206)
 	} else if !exsit {
-		return common.BackError(ctx,http.StatusBadRequest,207,"没有找到该用户")
+		return common.BackError(ctx, http.StatusBadRequest, 207, "没有找到该用户")
 	}
 
 	// 重置该用户密码
@@ -266,22 +266,22 @@ func ResetPwd(ctx echo.Context) error {
 
 	userModel.Salt = tools.RandomString()
 	userModel.Password = tools.Md5([]byte(data.Password + userModel.Salt))
-	if _,err := userModel.Update("salt,password");err != nil {
-		log.Printf("重置用户密码失败,用户信息:%#v,错误原因:%s\n",userModel,err.Error())
-		return common.BackServerError(ctx,207)
+	if _, err := userModel.Update("salt,password"); err != nil {
+		log.Printf("重置用户密码失败,用户信息:%#v,错误原因:%s\n", userModel, err.Error())
+		return common.BackServerError(ctx, 207)
 	}
 
 	// 删除该用户的所有重置token
-	if err := find.Delete(userModel.UserID);err != nil {
-		log.Printf("删除用户的重置token失败,用户id:%d,错误原因:%s\n",userModel,err.Error())
+	if err := find.Delete(userModel.UserID); err != nil {
+		log.Printf("删除用户的重置token失败,用户id:%d,错误原因:%s\n", userModel, err.Error())
 
 		userModel.Salt = oldSalt
 		userModel.Password = oldPassword
-		if _,err := userModel.Update("salt,password");err != nil {
-			log.Printf("还原用户原有salt和密码失败,用户信息%#v,错误原因:%s\n",userModel,err.Error())
+		if _, err := userModel.Update("salt,password"); err != nil {
+			log.Printf("还原用户原有salt和密码失败,用户信息%#v,错误原因:%s\n", userModel, err.Error())
 		}
 
-		return common.BackServerError(ctx,208)
+		return common.BackServerError(ctx, 208)
 	}
 
 	return common.BackOk(ctx)

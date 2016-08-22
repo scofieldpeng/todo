@@ -24,8 +24,8 @@ func List(ctx echo.Context) error {
 	if err != nil || pageSize < 1 {
 		pageSize = 20
 	}
-	categoryid,err := strconv.Atoi(ctx.QueryParam("categoryid"))
-	if err != nil || categoryid < 1{
+	categoryid, err := strconv.Atoi(ctx.QueryParam("categoryid"))
+	if err != nil || categoryid < 1 {
 		categoryid = 0
 	}
 	order := ctx.QueryParam("order")
@@ -34,28 +34,28 @@ func List(ctx echo.Context) error {
 	}
 
 	var lc todo.ListCondtion
-	startTime,err := strconv.Atoi(ctx.QueryParam("start_time"))
-	if err != nil || startTime < 0{
+	startTime, err := strconv.Atoi(ctx.QueryParam("start_time"))
+	if err != nil || startTime < 0 {
 		lc.StartTime = startTime
 	}
-	endTime,err := strconv.Atoi(ctx.QueryParam("end_time"))
+	endTime, err := strconv.Atoi(ctx.QueryParam("end_time"))
 	if err != nil {
 		lc.EndTime = endTime
 	}
-	startCreateTime,err := strconv.Atoi(ctx.QueryParam("start_create_time"))
+	startCreateTime, err := strconv.Atoi(ctx.QueryParam("start_create_time"))
 	if err != nil || startCreateTime < 0 {
 		lc.StartCreateTime = 0
 	}
-	endCreateTime,err := strconv.Atoi(ctx.QueryParam("end_create_time"))
+	endCreateTime, err := strconv.Atoi(ctx.QueryParam("end_create_time"))
 	if err != nil || endCreateTime < 0 {
 		lc.EndCreateTime = 0
 	}
-	star,err := strconv.Atoi(ctx.QueryParam("star"))
-	if err != nil || star < NormalTodo || star > EmergencyImportantTodo && star != -1{
+	star, err := strconv.Atoi(ctx.QueryParam("star"))
+	if err != nil || star < NormalTodo || star > EmergencyImportantTodo && star != -1 {
 		lc.Star = NormalTodo
 	}
 	status, err := strconv.Atoi(ctx.QueryParam("status"))
-	if err != nil || (status < StatusDefault || status > StatusPaused) && status != -1{
+	if err != nil || (status < StatusDefault || status > StatusPaused) && status != -1 {
 		status = StatusDefault
 	}
 
@@ -65,7 +65,7 @@ func List(ctx echo.Context) error {
 		todoModel.Status = status
 	}
 	todoModel.CategoryID = categoryid
-	total, list, err := todoModel.Page(page, pageSize, lc,order)
+	total, list, err := todoModel.Page(page, pageSize, lc, order)
 	if err != nil {
 		log.Println("获取todo列表数据失败,获取的userid为:", userid, ",错误原因:", err)
 		return common.BackServerError(ctx, 202)
@@ -111,16 +111,16 @@ func RegularList(ctx echo.Context) error {
 	}
 
 	var lc todo.ListCondtion
-	startCreateTime,err := strconv.Atoi(ctx.QueryParam("start_create_time"))
+	startCreateTime, err := strconv.Atoi(ctx.QueryParam("start_create_time"))
 	if err != nil || startCreateTime < 0 {
 		lc.StartCreateTime = 0
 	}
-	endCreateTime,err := strconv.Atoi(ctx.QueryParam("end_create_time"))
+	endCreateTime, err := strconv.Atoi(ctx.QueryParam("end_create_time"))
 	if err != nil || endCreateTime < 0 {
 		lc.EndCreateTime = 0
 	}
-	star,err := strconv.Atoi(ctx.QueryParam("star"))
-	if err != nil || star < NormalTodo || star > EmergencyImportantTodo && star != -1{
+	star, err := strconv.Atoi(ctx.QueryParam("star"))
+	if err != nil || star < NormalTodo || star > EmergencyImportantTodo && star != -1 {
 		lc.Star = 0
 	}
 
@@ -131,7 +131,7 @@ func RegularList(ctx echo.Context) error {
 	regularTodoModel.Star = star
 	regularTodoModel.Status = status
 
-	total, list, err := regularTodoModel.Page(page, pageSize,lc,order)
+	total, list, err := regularTodoModel.Page(page, pageSize, lc, order)
 	if err != nil {
 		log.Printf("获取定期todo列表数据失败,regularTodo数据:%#v,错误原因:%s\n", regularTodoModel, err.Error())
 		return common.BackServerError(ctx, 203)

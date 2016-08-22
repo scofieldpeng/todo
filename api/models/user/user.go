@@ -8,13 +8,13 @@ import (
 
 // User 用户结构体
 type User struct {
-	UserID      int    `json:"userid"       xorm:"not null INT(10) pk autoincr 'userid'"` // 用户id
-	Email       string `json:"email"        xorm:"not null VARCHAR(100) index"`           // 邮箱
-	UserName    string `json:"user_name"    xorm:"not null INT(10) index"`                // 用户登录名
-	Password    string `json:"-"            xorm:"not null VARCHAR(32)"`                  // 密码
-	Salt        string `json:"-"            xorm:"not null VARCHAR(8)"`                   // SALT
-	CreateTime  int    `json:"create_time"  xorm:"not null INT(10)"`                      // 账号创建时间
-	LastLogin   int    `json:"last_login"   xorm:"not null INT(11)"`                      // 最近一次登录时间
+	UserID     int    `json:"userid"       xorm:"not null INT(10) pk autoincr 'userid'"` // 用户id
+	Email      string `json:"email"        xorm:"not null VARCHAR(100) index"`           // 邮箱
+	UserName   string `json:"user_name"    xorm:"not null INT(10) index"`                // 用户登录名
+	Password   string `json:"-"            xorm:"not null VARCHAR(32)"`                  // 密码
+	Salt       string `json:"-"            xorm:"not null VARCHAR(8)"`                   // SALT
+	CreateTime int    `json:"create_time"  xorm:"not null INT(10)"`                      // 账号创建时间
+	LastLogin  int    `json:"last_login"   xorm:"not null INT(11)"`                      // 最近一次登录时间
 }
 
 // New 新建一个用户结构体对象
@@ -29,7 +29,7 @@ func (u *User) Insert() (int64, error) {
 
 // Get 获取用户名
 func (u *User) Get() (bool, error) {
-	if u.UserID == 0 && u.UserName == "" && u.Email == ""{
+	if u.UserID == 0 && u.UserName == "" && u.Email == "" {
 		return false, errors.New("获取用户信息必须指定用户id或者用户名")
 	}
 	return mysql.Select().XormEngine().Get(u)

@@ -1,12 +1,12 @@
 package routes
 
 import (
+	"github.com/labstack/echo/middleware"
+	"github.com/scofieldpeng/todo/api/controllers/comment"
 	"github.com/scofieldpeng/todo/api/controllers/todo"
 	"github.com/scofieldpeng/todo/api/controllers/user"
 	"github.com/scofieldpeng/todo/api/libs/auth"
 	"github.com/scofieldpeng/todo/api/libs/common"
-	"github.com/scofieldpeng/todo/api/controllers/comment"
-	"github.com/labstack/echo/middleware"
 )
 
 func init() {
@@ -27,19 +27,19 @@ func init() {
 
 	// 定期TODO
 	// 定期TODO列表
-	apiV1.Get(`/todo/regular/:userid`,todo.RegularList)
+	apiV1.Get(`/todo/regular/:userid`, todo.RegularList)
 	// 定期TODO详情
-	apiV1.Get(`/todo/regular/:userid/:todoid`,todo.RegularDetail)
+	apiV1.Get(`/todo/regular/:userid/:todoid`, todo.RegularDetail)
 	// 定期TODO更新
-	apiV1.PUT(`/todo/regular/:userid/:todoid`,todo.RegularUpdate)
+	apiV1.PUT(`/todo/regular/:userid/:todoid`, todo.RegularUpdate)
 	// 删除定期TODO
-	apiV1.DELETE(`/todo/regular/:userid/:todoid`,todo.RegularDelete)
+	apiV1.DELETE(`/todo/regular/:userid/:todoid`, todo.RegularDelete)
 
 	// TODO评论
-	apiV1.GET(`/todo/:todoid/comments`,comment.List) // todo评论列表
-	apiV1.POST(`/todo/:todoid/comments`,comment.Post) // todo添加
-	apiV1.PUT(`/todo/:todoid/comments/:commentid`,comment.Put) // todo更新
-	apiV1.DELETE(`/todo/:todoid/comments/:commentid`,comment.Delete) // todo删除
+	apiV1.GET(`/todo/:todoid/comments`, comment.List)                 // todo评论列表
+	apiV1.POST(`/todo/:todoid/comments`, comment.Post)                // todo添加
+	apiV1.PUT(`/todo/:todoid/comments/:commentid`, comment.Put)       // todo更新
+	apiV1.DELETE(`/todo/:todoid/comments/:commentid`, comment.Delete) // todo删除
 
 	apiV1.POST(`/login`, user.Login)       // 登录用户
 	apiV1.POST(`/register`, user.Register) // 注册用户

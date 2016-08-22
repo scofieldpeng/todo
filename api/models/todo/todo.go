@@ -29,7 +29,7 @@ type ListCondtion struct {
 	EndTime         int // 结束时间
 	StartCreateTime int // 创建时间(起)
 	EndCreateTime   int // 创建时间(止)
-	Star int // 重要程度
+	Star            int // 重要程度
 }
 
 // New 新建一个todo结构体对象
@@ -55,7 +55,7 @@ func (t *Todo) UpdateByID(cols ...string) (int64, error) {
 }
 
 // UpdateByRegularID 更新regularID更新
-func (t *Todo) UpdateByRegularID(cols ...string)(int64,error) {
+func (t *Todo) UpdateByRegularID(cols ...string) (int64, error) {
 	engine := mysql.Select().XormEngine().NewSession()
 	if len(cols) == 0 {
 		engine.AllCols()
@@ -63,7 +63,7 @@ func (t *Todo) UpdateByRegularID(cols ...string)(int64,error) {
 		engine.Cols(cols...)
 	}
 
-	return engine.Where("regular_todoid=? AND status=?",t.RegularTodoID,t.Status).Update(t)
+	return engine.Where("regular_todoid=? AND status=?", t.RegularTodoID, t.Status).Update(t)
 }
 
 // Get 获取一条数据
@@ -80,11 +80,11 @@ func (t *Todo) Delete() (int64, error) {
 }
 
 // DeleteByIDs 删除一定id区间内的todo数据
-func (t *Todo) DeleteByIDs(ids []int)(int64,error) {
+func (t *Todo) DeleteByIDs(ids []int) (int64, error) {
 	if len(ids) == 0 {
-		return 0,nil
+		return 0, nil
 	}
-	return mysql.Select().XormEngine().In("id",ids).Delete(t)
+	return mysql.Select().XormEngine().In("id", ids).Delete(t)
 }
 
 // List 获取列表数据
@@ -102,39 +102,39 @@ func (t *Todo) List(order ...string) ([]Todo, error) {
 }
 
 // Page 获取分页列表数据
-func (t *Todo) Page(page,pageSize int,whereCond ListCondtion,order ...string) (int64,[]Todo,error) {
+func (t *Todo) Page(page, pageSize int, whereCond ListCondtion, order ...string) (int64, []Todo, error) {
 	t1 := *t
 	var list []Todo
 	totalEngine := mysql.Select().XormEngine().NewSession()
 	listEngine := mysql.Select().XormEngine()
 
-	if whereCond.StartTime !=0 {
-		totalEngine.Where("start_time>=?",whereCond.StartTime)
-		listEngine.Where("start_time>=?",whereCond.StartTime)
+	if whereCond.StartTime != 0 {
+		totalEngine.Where("start_time>=?", whereCond.StartTime)
+		listEngine.Where("start_time>=?", whereCond.StartTime)
 		t1.StartTime = 0
 	}
 	if whereCond.EndTime != 0 {
-		totalEngine.Where("end_time<=?",whereCond.EndTime)
-		listEngine.Where("end_time<=?",whereCond.EndTime)
+		totalEngine.Where("end_time<=?", whereCond.EndTime)
+		listEngine.Where("end_time<=?", whereCond.EndTime)
 		t1.EndTime = 0
 	}
 
 	if whereCond.StartCreateTime != 0 {
-		totalEngine.Where("create_time<=?",whereCond.StartCreateTime)
-		listEngine.Where("create_time<=?",whereCond.EndCreateTime)
+		totalEngine.Where("create_time<=?", whereCond.StartCreateTime)
+		listEngine.Where("create_time<=?", whereCond.EndCreateTime)
 		t1.CreateTime = 0
 	}
 	if whereCond.Star != 0 {
-		totalEngine.Where("star=?",t1.Star)
-		listEngine.Where("star=?",t1.Star)
+		totalEngine.Where("star=?", t1.Star)
+		listEngine.Where("star=?", t1.Star)
 	}
 
-	total,err := totalEngine.Count(t1)
+	total, err := totalEngine.Count(t1)
 	if err != nil {
-		return 0,[]Todo{},err
+		return 0, []Todo{}, err
 	}
 	if total < 1 {
-		return 0,[]Todo{},nil
+		return 0, []Todo{}, nil
 	}
 	if len(order) > 0 {
 		listEngine.OrderBy(order[0])
@@ -147,9 +147,9 @@ func (t *Todo) Page(page,pageSize int,whereCond ListCondtion,order ...string) (i
 		page = 1
 	}
 
-	if err := listEngine.Limit(pageSize,(page-1)*pageSize).Find(&list,t1);err != nil {
-		return 0,[]Todo{},err
+	if err := listEngine.Limit(pageSize, (page-1)*pageSize).Find(&list, t1); err != nil {
+		return 0, []Todo{}, err
 	}
 
-	return total,list,nil
+	return total, list, nil
 }

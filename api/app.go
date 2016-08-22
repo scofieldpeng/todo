@@ -6,15 +6,15 @@ import (
 	"github.com/scofieldpeng/config-go"
 	"github.com/scofieldpeng/mysql-go"
 	"github.com/scofieldpeng/redis-go"
+	"github.com/scofieldpeng/template-go"
+	"github.com/scofieldpeng/todo/api/libs/auth"
 	"github.com/scofieldpeng/todo/api/libs/common"
 	_ "github.com/scofieldpeng/todo/api/libs/log"
 	_ "github.com/scofieldpeng/todo/api/routes"
-	"log"
-	"github.com/scofieldpeng/todo/api/libs/auth"
-	"github.com/scofieldpeng/template-go"
-	"path/filepath"
-	"os"
 	"github.com/tylerb/graceful"
+	"log"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -30,8 +30,8 @@ func init() {
 	log.Println("初始化config完成")
 
 	// 初始化auth
-	if err := auth.Init();err != nil {
-		log.Fatalln("初始化auth失败,错误原因:",err)
+	if err := auth.Init(); err != nil {
+		log.Fatalln("初始化auth失败,错误原因:", err)
 	}
 	log.Println("初始化auth成功")
 
@@ -40,24 +40,24 @@ func init() {
 	log.Println("初始化redis完成")
 
 	// 初始化myql
-	if err := mysql.Init(config.Config("mysql"),common.Debug); err != nil {
+	if err := mysql.Init(config.Config("mysql"), common.Debug); err != nil {
 		log.Fatalln("初始化mysql失败,错误原因:", err)
 	}
 	log.Println("初始化mysql完成")
 
 	// 初始化tpl
 	template.Tpl.SetTplSuffix(".html")
-	template.Tpl.SetDelimeter("[[","]]")
-	currentPath,_ := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err := template.Tpl.New(currentPath + string(os.PathSeparator) + "tpls" + string(os.PathSeparator));err != nil {
-		log.Fatalln("初始化tpl失败!错误原因:",err.Error())
+	template.Tpl.SetDelimeter("[[", "]]")
+	currentPath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err := template.Tpl.New(currentPath + string(os.PathSeparator) + "tpls" + string(os.PathSeparator)); err != nil {
+		log.Fatalln("初始化tpl失败!错误原因:", err.Error())
 	}
 	common.Echo.SetRenderer(template.Tpl)
 }
 
 func main() {
-	host,_ := config.Config("app").Get("app","host")
-	port,_ := config.Config("app").Get("app","port")
+	host, _ := config.Config("app").Get("app", "host")
+	port, _ := config.Config("app").Get("app", "port")
 	if host == "" {
 		host = "127.0.0.1"
 	}
@@ -67,5 +67,5 @@ func main() {
 
 	std := standard.New(host + ":" + port)
 	std.SetHandler(common.Echo)
-	graceful.ListenAndServe(std.Server,5*time.Second)
+	graceful.ListenAndServe(std.Server, 5*time.Second)
 }

@@ -1,9 +1,9 @@
 package auth
 
 import (
+	"fmt"
 	"github.com/labstack/echo"
 	"github.com/scofieldpeng/todo/api/libs/common"
-	"fmt"
 )
 
 // Check 用户api接口检查用户授权的middleware
@@ -20,7 +20,7 @@ func Check(next echo.HandlerFunc) echo.HandlerFunc {
 			fmt.Println("need auth,but not found cookie")
 			return common.BackUnAuthorized(ctx)
 		}
-		fmt.Println("auth cookie:",cookie)
+		fmt.Println("auth cookie:", cookie)
 
 		userid := GetUseridFromRedis(cookie)
 		if userid == 0 {

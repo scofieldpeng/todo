@@ -35,7 +35,7 @@ func update() {
 func setOutput(fileName string) {
 	// 检查log文件夹是否存在
 	os.Mkdir(common.AppDir()+string(os.PathSeparator)+"log"+string(os.PathSeparator), os.FileMode(0755))
-	obj, err := os.OpenFile(common.AppDir()+string(os.PathSeparator)+ "log" + string(os.PathSeparator) + fileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(0655))
+	obj, err := os.OpenFile(common.AppDir()+string(os.PathSeparator)+"log"+string(os.PathSeparator)+fileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.FileMode(0655))
 	if err != nil {
 		log.Println("设置log的out文件出错,原因:", err.Error())
 		log.SetOutput(os.Stdout)

@@ -9,5 +9,5 @@ const (
 
 // RedisLoginTokenName 获取redis中用户token的字段名称
 func RedisLoginTokenName(token string) string {
-    return fmt.Sprintf("todo:logintoken:%s",token)
+	return fmt.Sprintf("todo:logintoken:%s", token)
 }
