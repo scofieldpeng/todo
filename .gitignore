@@ -28,5 +28,5 @@ _testmain.go
 /.idea
 /todo.git
 /todo
-/log
+/api/log
 /todo_linux_amd64
