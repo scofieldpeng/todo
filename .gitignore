@@ -25,7 +25,7 @@ _testmain.go
 
 .Ds_Store
 /todo.iml
-/.idea
+.idea
 /todo.git
 /todo
 /api/log
